@@ -1,0 +1,33 @@
+class ZCX_CA_TEXT_TEMPLATE definition
+  public
+  inheriting from CX_STATIC_CHECK
+  create public .
+
+public section.
+
+  constants ERROR_TO_SAVE type SOTR_CONC value '080027C18A1F1EDA82FB5FE2B45915C8' ##NO_TEXT.
+  constants NO_DATA_TO_SAVE type SOTR_CONC value '080027C18A1F1EDA82FB5FE2B45935C8' ##NO_TEXT.
+  constants TEMPLATE_NOT_EXIST type SOTR_CONC value '080027C18A1F1EDA82FB78BD9E5055CD' ##NO_TEXT.
+  constants ERROR_TO_COPY type SOTR_CONC value '080027C18A1F1EDA82FB7978209915CD' ##NO_TEXT.
+
+  methods CONSTRUCTOR
+    importing
+      !TEXTID like TEXTID optional
+      !PREVIOUS like PREVIOUS optional .
+protected section.
+private section.
+ENDCLASS.
+
+
+
+CLASS ZCX_CA_TEXT_TEMPLATE IMPLEMENTATION.
+
+
+  method CONSTRUCTOR.
+CALL METHOD SUPER->CONSTRUCTOR
+EXPORTING
+TEXTID = TEXTID
+PREVIOUS = PREVIOUS
+.
+  endmethod.
+ENDCLASS.
