@@ -130,7 +130,7 @@ CLASS ZCL_CA_TEXT_TEMPLATE IMPLEMENTATION.
   METHOD save.
     DATA lt_data_db TYPE STANDARD TABLE OF zca_t_text_templ.
 
-    IF lt_data_db IS INITIAL.
+    IF it_data IS INITIAL.
       RAISE EXCEPTION TYPE zcx_ca_text_template
         EXPORTING
           textid = zcx_ca_text_template=>no_data_to_save.
