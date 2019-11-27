@@ -1,7 +1,7 @@
 *&---------------------------------------------------------------------*
 *& Include ZCA_R_TEXT_TEMPLATE_TOP                  - Module Pool      ZCA_R_TEXT_TEMPLATE
 *&---------------------------------------------------------------------*
-PROGRAM zca_r_text_template.
+PROGRAM zca_r_text_template MESSAGE-ID ZCA_TEXT_TEMPLATES.
 
 *----------------------------------------------------------------------*
 * Variables de dynpro 9000
@@ -35,6 +35,7 @@ DATA:      ok_code LIKE sy-ucomm.
 * Variables de para guardar el cuerpo y asunto del mail
 DATA mv_mail_body TYPE string.
 DATA mv_mail_subject TYPE string.
+DATA mv_mail_subject_last TYPE string.
 
 *----------------------------------------------------------------------*
 * Variables generales

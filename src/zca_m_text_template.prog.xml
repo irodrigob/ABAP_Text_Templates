@@ -246,7 +246,7 @@
        <ICON_NAME>ICON_CLOSE</ICON_NAME>
        <WITH_ICON>X</WITH_ICON>
        <LINE>009</LINE>
-       <COLUMN>056</COLUMN>
+       <COLUMN>051</COLUMN>
        <LENGTH>016</LENGTH>
        <VISLENGTH>014</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -264,7 +264,7 @@
        <ICON_NAME>ICON_IMPORT_TRANSPORT_REQUEST</ICON_NAME>
        <WITH_ICON>X</WITH_ICON>
        <LINE>009</LINE>
-       <COLUMN>079</COLUMN>
+       <COLUMN>069</COLUMN>
        <LENGTH>016</LENGTH>
        <VISLENGTH>014</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -277,12 +277,30 @@
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>PUSH</TYPE>
+       <NAME>TCOPY</NAME>
+       <TEXT>Copy_______</TEXT>
+       <ICON_NAME>ICON_SYSTEM_COPY</ICON_NAME>
+       <WITH_ICON>X</WITH_ICON>
+       <LINE>009</LINE>
+       <COLUMN>088</COLUMN>
+       <LENGTH>016</LENGTH>
+       <VISLENGTH>014</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <GROUP1>TML</GROUP1>
+       <PUSH_FCODE>TCOPY</PUSH_FCODE>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>PUSH</TYPE>
        <NAME>TDELETE</NAME>
        <TEXT>Delete_____</TEXT>
        <ICON_NAME>ICON_DELETE</ICON_NAME>
        <WITH_ICON>X</WITH_ICON>
        <LINE>009</LINE>
-       <COLUMN>102</COLUMN>
+       <COLUMN>106</COLUMN>
        <LENGTH>016</LENGTH>
        <VISLENGTH>014</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -357,13 +375,13 @@
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>MODULE TAB_SECTIONS_ACTIVE_TAB_SET.</LINE>
+       <LINE>MODULE tab_sections_active_tab_set.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>CALL SUBSCREEN TAB_SECTIONS_SCA</LINE>
+       <LINE>CALL SUBSCREEN tab_sections_sca</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>INCLUDING G_TAB_SECTIONS-PROG G_TAB_SECTIONS-SUBSCREEN.</LINE>
+       <LINE>INCLUDING g_tab_sections-prog g_tab_sections-subscreen.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW/>
@@ -381,10 +399,10 @@
        <LINE>*&amp;SPWIZARD: PAI FLOW LOGIC FOR TABSTRIP &apos;TAB_SECTIONS&apos;</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>CALL SUBSCREEN TAB_SECTIONS_SCA.</LINE>
+       <LINE>CALL SUBSCREEN tab_sections_sca.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE TAB_SECTIONS_ACTIVE_TAB_GET.</LINE>
+       <LINE>MODULE tab_sections_active_tab_get.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
@@ -395,6 +413,10 @@
       </RPY_DYFLOW>
       <RPY_DYFLOW>
        <LINE>ENDCHAIN.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW/>
+      <RPY_DYFLOW>
+       <LINE>FIELD mv_langu MODULE change_laguage ON REQUEST.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
@@ -423,6 +445,8 @@
       <item>0</item>
       <item>2</item>
       <item>4</item>
+      <item>2</item>
+      <item>0</item>
       <item>2</item>
       <item>0</item>
       <item>2</item>
@@ -724,21 +748,10 @@
    </CUA>
    <TPOOL>
     <item>
-     <ID>R</ID>
-     <ENTRY>Program ZCA_R_TEXT_TEMPLATE</ENTRY>
-     <LENGTH>27</LENGTH>
-    </item>
-    <item>
      <ID>I</ID>
      <KEY>NOP</KEY>
      <ENTRY>No</ENTRY>
      <LENGTH>12</LENGTH>
-    </item>
-    <item>
-     <ID>I</ID>
-     <KEY>S01</KEY>
-     <ENTRY>Template saved</ENTRY>
-     <LENGTH>24</LENGTH>
     </item>
     <item>
      <ID>I</ID>
@@ -754,9 +767,32 @@
     </item>
     <item>
      <ID>I</ID>
+     <KEY>T03</KEY>
+     <ENTRY>Copy to template</ENTRY>
+     <LENGTH>26</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>T04</KEY>
+     <ENTRY>Language change</ENTRY>
+     <LENGTH>25</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>T05</KEY>
+     <ENTRY>Template data has been modified. Do you want to record them?</ENTRY>
+     <LENGTH>120</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
      <KEY>YES</KEY>
      <ENTRY>Yes</ENTRY>
      <LENGTH>13</LENGTH>
+    </item>
+    <item>
+     <ID>R</ID>
+     <ENTRY>Program ZCA_R_TEXT_TEMPLATE</ENTRY>
+     <LENGTH>27</LENGTH>
     </item>
    </TPOOL>
   </asx:values>

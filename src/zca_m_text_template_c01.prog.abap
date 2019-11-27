@@ -23,7 +23,22 @@ CLASS lcl_contr DEFINITION.
     METHODS close_template.
     METHODS set_content_mail_body.
     METHODS save
-      RAISING zcx_ca_text_template.
+      IMPORTING
+                !iv_langu TYPE sylangu OPTIONAL
+      RAISING   zcx_ca_text_template.
+    METHODS delete.
+    METHODS copy
+      IMPORTING
+                iv_appl_from     TYPE zca_t_text_templ-appl
+                iv_appl_to       TYPE zca_t_text_templ-appl
+                iv_template_from TYPE zca_t_text_templ-name
+                iv_template_to   TYPE zca_t_text_templ-name
+      RAISING   zcx_ca_text_template.
+    METHODS edit_mail_created
+      RETURNING VALUE(rv_created) TYPE sap_bool.
+    METHODS check_mail_changed
+      RETURNING
+        VALUE(rv_changed) TYPE sap_bool.
 
   PROTECTED SECTION.
     " Tabla interna que contiene todos las secciones en todos los idiomas de la plantilla
@@ -40,11 +55,14 @@ CLASS lcl_contr DEFINITION.
     METHODS destroy_mail_body_object.
     METHODS create_editor_mail_objects
       RAISING zcx_ca_text_template.
-    METHODS transf_var_mail_2_sections.
-    METHODS transf_var_mail_2_sect_mail.
+    METHODS transf_var_mail_2_sections
+      IMPORTING !iv_langu TYPE sylangu OPTIONAL.
+    METHODS transf_var_mail_2_sect_mail
+      IMPORTING !iv_langu TYPE sylangu OPTIONAL.
     METHODS get_content_mail_body
       RETURNING
         VALUE(rv_body) TYPE bsstring.
+
 
 
 
@@ -61,7 +79,10 @@ CLASS lcl_contr IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD read.
-    CLEAR: mt_sections_data.
+
+    clear_section_single_var(  ). " Se resetean variables de las seccion
+
+    mv_transf_mail_body_editor = abap_false. " Se indica que en cuerpo no se ha transferido para que se haga al leer los datos
 
     " Se leen los datos del modelo
     mo_model->read(
@@ -225,7 +246,7 @@ CLASS lcl_contr IMPLEMENTATION.
 
   METHOD save.
     " Primero es mover las variables del programa a sus respectiva sección
-    transf_var_mail_2_sections(  ).
+    transf_var_mail_2_sections( iv_langu ).
 
     mo_model->save(
       EXPORTING
@@ -239,27 +260,35 @@ CLASS lcl_contr IMPLEMENTATION.
   METHOD transf_var_mail_2_sections.
 
     " Mail
-    transf_var_mail_2_sect_mail(  ).
+    transf_var_mail_2_sect_mail( iv_langu ).
 
 
   ENDMETHOD.
 
 
   METHOD transf_var_mail_2_sect_mail.
+
+    " El idioma se toma primero del parámetor en caso contrario del idioma
+    IF iv_langu IS NOT INITIAL.
+      DATA(lv_langu) = iv_langu.
+    ELSE.
+      lv_langu = mv_langu.
+    ENDIF.
+
     " Asunto
     READ TABLE mt_sections_data ASSIGNING FIELD-SYMBOL(<ls_section>) WITH KEY section = zif_ca_ttemplate_data=>cs_section-subject
-                                                                                          langu = mv_langu.
+                                                                                          langu = lv_langu.
     IF sy-subrc NE 0.
-      INSERT VALUE #( langu = mv_langu section = zif_ca_ttemplate_data=>cs_section-subject content = mv_mail_subject ) INTO TABLE mt_sections_data.
+      INSERT VALUE #( langu = lv_langu section = zif_ca_ttemplate_data=>cs_section-subject content = mv_mail_subject ) INTO TABLE mt_sections_data.
     ELSE.
       <ls_section>-content = mv_mail_subject.
     ENDIF.
 
     " Cuerpo
     READ TABLE mt_sections_data ASSIGNING <ls_section> WITH KEY section = zif_ca_ttemplate_data=>cs_section-body
-                                                                                      langu = mv_langu.
+                                                                                      langu = lv_langu.
     IF sy-subrc NE 0.
-      INSERT VALUE #( langu = mv_langu section = zif_ca_ttemplate_data=>cs_section-body content = get_content_mail_body(  ) ) INTO TABLE mt_sections_data.
+      INSERT VALUE #( langu = lv_langu section = zif_ca_ttemplate_data=>cs_section-body content = get_content_mail_body(  ) ) INTO TABLE mt_sections_data.
     ELSE.
       <ls_section>-content = get_content_mail_body(  ).
     ENDIF.
@@ -309,6 +338,52 @@ CLASS lcl_contr IMPLEMENTATION.
 
       CATCH cx_root.
     ENDTRY.
+
+  ENDMETHOD.
+
+
+  METHOD delete.
+    mo_model->delete(
+      EXPORTING
+        iv_appl  = mv_appl
+        iv_name  = mv_template ).
+
+  ENDMETHOD.
+
+
+  METHOD copy.
+
+    mo_model->copy(
+      EXPORTING
+        iv_appl_from         = iv_appl_from
+        iv_appl_to           = iv_appl_to
+        iv_name_from         = iv_template_from
+        iv_name_to           = iv_template_to ).
+
+  ENDMETHOD.
+  METHOD edit_mail_created.
+    IF mo_mail_body_editor IS BOUND.
+      rv_created = abap_true.
+    ELSE.
+      rv_created = abap_false.
+    ENDIF.
+  ENDMETHOD.
+
+
+  METHOD check_mail_changed.
+    rv_changed = abap_false. " Por defecto no hay cambios
+
+    " Se mira si el asunto ha cambiado
+    IF mv_mail_subject NE mv_mail_subject_last.
+      rv_changed = abap_true.
+    ELSE. " Se mira el cuerpo
+      IF mo_mail_body_editor IS BOUND. " Solo si el editor ha sido instanciado
+        IF mo_mail_body_editor->get_is_modified(  ) = 1.
+          rv_changed = abap_true.
+        ENDIF.
+      ENDIF.
+    ENDIF.
+
 
   ENDMETHOD.
 

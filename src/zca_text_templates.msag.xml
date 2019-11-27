@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_MSAG" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <T100A>
+    <ARBGB>ZCA_TEXT_TEMPLATES</ARBGB>
+    <MASTERLANG>E</MASTERLANG>
+    <STEXT>CA - Text templates</STEXT>
+   </T100A>
+   <T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZCA_TEXT_TEMPLATES</ARBGB>
+     <MSGNR>000</MSGNR>
+     <TEXT>&amp; &amp; &amp; &amp;</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZCA_TEXT_TEMPLATES</ARBGB>
+     <MSGNR>001</MSGNR>
+     <TEXT>Template deleted</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZCA_TEXT_TEMPLATES</ARBGB>
+     <MSGNR>002</MSGNR>
+     <TEXT>Template saved</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZCA_TEXT_TEMPLATES</ARBGB>
+     <MSGNR>003</MSGNR>
+     <TEXT>Error to save the template</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZCA_TEXT_TEMPLATES</ARBGB>
+     <MSGNR>004</MSGNR>
+     <TEXT>The new template already exist</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZCA_TEXT_TEMPLATES</ARBGB>
+     <MSGNR>005</MSGNR>
+     <TEXT>Both fields are required.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZCA_TEXT_TEMPLATES</ARBGB>
+     <MSGNR>006</MSGNR>
+     <TEXT>Template copied</TEXT>
+    </T100>
+   </T100>
+  </asx:values>
+ </asx:abap>
+</abapGit>

@@ -61,3 +61,78 @@ FORM read_template .
   mo_controller->propagate_sections_data(  ).
 
 ENDFORM.
+
+FORM save_template.
+  TRY.
+      mo_controller->save( ).
+
+      MESSAGE s002.
+    CATCH zcx_ca_text_template.
+      MESSAGE w003.
+  ENDTRY.
+ENDFORM.
+FORM copy_template.
+  DATA lt_fields TYPE STANDARD TABLE OF sval.
+  DATA lv_code TYPE c.
+
+  " Inserto los campos donde se introducirán el nombre y aplicacion, por defecto se informa la aplicación.
+  lt_fields = VALUE #( ( tabname = |ZCA_T_TEXT_TEMPL| fieldname = |APPL| value = mv_appl )
+                       ( tabname = |ZCA_T_TEXT_TEMPL| fieldname = |NAME| ) ).
+
+  DO.
+    CALL FUNCTION 'POPUP_GET_VALUES_USER_HELP'
+      EXPORTING
+        popup_title     = TEXT-t03
+        f4_formname     = 'F4_TEMPLATE'
+        f4_programname  = sy-cprog
+      IMPORTING
+        returncode      = lv_code
+      TABLES
+        fields          = lt_fields[]
+      EXCEPTIONS
+        error_in_fields = 1
+        OTHERS          = 2.
+
+    IF lv_code IS INITIAL. " Enter
+
+      " Se recupera los valores introducidos
+      READ TABLE lt_fields ASSIGNING FIELD-SYMBOL(<ls_fields>) INDEX 1.
+      DATA(lv_new_appl) = <ls_fields>-value.
+      READ TABLE lt_fields ASSIGNING <ls_fields> INDEX 2.
+      DATA(lv_new_template) = <ls_fields>-value.
+
+      " Los dos campos han de estar informados.
+      IF lv_new_appl IS NOT INITIAL AND lv_new_template IS NOT INITIAL.
+
+        IF mo_controller->exist( iv_appl = CONV #( lv_new_appl ) iv_template = CONV #( lv_new_template ) ) = abap_true.
+          MESSAGE s004.
+        ELSE.
+
+          EXIT.
+        ENDIF.
+      ELSE.
+        MESSAGE s004.
+      ENDIF.
+
+    ELSE. " Boton cancelar que devuelve una 'A'.
+      CLEAR: lv_new_template, lv_new_appl.
+      EXIT.
+    ENDIF.
+  ENDDO.
+
+  " Si los dos campos están informados se hace la copia
+  IF lv_new_appl IS NOT INITIAL AND lv_new_template IS NOT INITIAL.
+
+    TRY.
+        mo_controller->copy( iv_appl_from = mv_appl
+                             iv_appl_to = CONV #( lv_new_appl )
+                             iv_template_from = mv_template
+                             iv_template_to = CONV #( lv_new_template ) ).
+        MESSAGE s006.
+      CATCH zcx_ca_text_template INTO DATA(lo_excep).
+        MESSAGE s000 WITH lo_excep->get_text(  ).
+    ENDTRY.
+  ENDIF.
+
+
+ENDFORM.

@@ -29,6 +29,7 @@ INTERFACE zif_ca_ttemplate_data
                  template_transport TYPE string VALUE 'TTRANSP',
                  template_save      TYPE string VALUE 'TSAVE',
                  template_close     TYPE string VALUE 'TCLOSE',
+                 template_copy     TYPE string VALUE 'TCOPY',
                END OF buttons_code,
                BEGIN OF popup_answer,
                  yes    TYPE c LENGTH 1 VALUE '1',

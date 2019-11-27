@@ -77,6 +77,11 @@ MODULE controls OUTPUT.
   " El idioma por defecto será el de logon
   mv_langu = COND #( WHEN mv_langu IS INITIAL THEN sy-langu ELSE mv_langu ).
 
+  " Se guarda el último idioma usado para poder restaurarlo en caso necesario cuando se cambie de idioma
+  mv_langu_last = mv_langu.
+
+  " Se guarda el último asunto introducido
+  mv_mail_subject_last = mv_mail_subject.
 ENDMODULE.
 
 *&SPWIZARD: OUTPUT MODULE FOR TS 'TAB_SECTIONS'. DO NOT CHANGE THIS LINE

@@ -41,7 +41,8 @@ CLASS zcl_ca_text_template DEFINITION
         !iv_langu TYPE sylangu OPTIONAL.
     METHODS copy
       IMPORTING
-                !iv_appl      TYPE zca_e_ttempl_appl
+                !iv_appl_from TYPE zca_e_ttempl_appl
+                !iv_appl_to   TYPE zca_e_ttempl_appl
                 !iv_name_from TYPE zca_e_ttempl_name
                 !iv_name_to   TYPE zca_e_ttempl_name
                 !iv_langu     TYPE sylangu OPTIONAL
@@ -52,20 +53,20 @@ ENDCLASS.
 
 
 
-CLASS ZCL_CA_TEXT_TEMPLATE IMPLEMENTATION.
+CLASS zcl_ca_text_template IMPLEMENTATION.
 
 
   METHOD copy.
 
     " Primero se lee la plantilla de origen
-    read( EXPORTING iv_appl  = iv_appl
+    read( EXPORTING iv_appl  = iv_appl_from
                     iv_name  = iv_name_from
                     iv_langu = iv_langu
                     IMPORTING et_data  = DATA(lt_data_from) ).
 
-    IF lt_data_from IS INITIAL. " Si hay datos se graba con el nuevo nombre
+    IF lt_data_from IS NOT INITIAL. " Si hay datos se graba con el nuevo nombre
       TRY.
-          save( EXPORTING iv_appl = iv_appl
+          save( EXPORTING iv_appl = iv_appl_to
                           iv_name              = iv_name_to
                           it_data              = lt_data_from ).
         CATCH zcx_ca_text_template.
