@@ -11,6 +11,20 @@
     <FIXPT>X</FIXPT>
     <UNICODE>X</UNICODE>
    </VSEOCLASS>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_CA_TEXT_TEMPLATE</CLSNAME>
+     <CMPNAME>CHECK_TRANSPORT_ORDER</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Check if the transport order is valid</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_CA_TEXT_TEMPLATE</CLSNAME>
+     <CMPNAME>SAVE_TRANSPORT_ORDER</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Save the template in transport order</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
   </asx:values>
  </asx:abap>
 </abapGit>

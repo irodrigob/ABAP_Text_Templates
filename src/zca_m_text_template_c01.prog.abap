@@ -52,6 +52,8 @@ CLASS lcl_contr DEFINITION.
     DATA mo_mail_body_editor   TYPE REF TO if_btf_editor.
     DATA mo_mail_body_doc TYPE REF TO if_btf_document.
     DATA mv_transf_mail_body_editor TYPE sap_bool.
+    DATA mv_transport_order TYPE e070-trkorr.
+
     METHODS destroy_mail_body_object.
     METHODS create_editor_mail_objects
       RAISING zcx_ca_text_template.
@@ -62,6 +64,8 @@ CLASS lcl_contr DEFINITION.
     METHODS get_content_mail_body
       RETURNING
         VALUE(rv_body) TYPE bsstring.
+    METHODS select_check_transport_order
+      RAISING zcx_ca_text_template.
 
 
 
@@ -245,14 +249,30 @@ CLASS lcl_contr IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD save.
+
+    CALL METHOD cl_gui_cfw=>flush
+      EXCEPTIONS
+        cntl_system_error = 1
+        cntl_error        = 2
+        OTHERS            = 3.
+
     " Primero es mover las variables del programa a sus respectiva sección
     transf_var_mail_2_sections( iv_langu ).
+
+    " Se selección la orden de transporte
+    select_check_transport_order(  ).
+
 
     mo_model->save(
       EXPORTING
         iv_appl              = mv_appl
         iv_name              = mv_template
-        it_data              = mt_sections_data ).
+        it_data              = mt_sections_data
+        iv_save_transp_order = abap_true
+     CHANGING cv_order = mv_transport_order ).
+
+    " Se resetea que el cuerpo del mail ha sido modificado
+    mo_mail_body_editor->set_is_modified(  ).
 
   ENDMETHOD.
 
@@ -384,6 +404,37 @@ CLASS lcl_contr IMPLEMENTATION.
       ENDIF.
     ENDIF.
 
+
+  ENDMETHOD.
+
+
+  METHOD select_check_transport_order.
+
+    DATA(lv_request_order) = abap_false. " Por defecto no se pedirá orden de transporte
+    IF mv_transport_order IS NOT INITIAL. " Si esta informada se valida la orden
+      TRY.
+          mo_model->check_transport_order( CHANGING cv_order = mv_transport_order ).
+        CATCH zcx_ca_text_template. " Si no es valida se pedirá la orden
+          lv_request_order = abap_true.
+      ENDTRY.
+    ELSE.
+      lv_request_order = abap_true.
+    ENDIF.
+
+    " Si se tiene que pedir orden se llama a la función estándar
+    IF lv_request_order = abap_true.
+
+      CLEAR mv_transport_order. " Reseteo porque la que habia no es valida.
+
+      CALL FUNCTION 'TR_ORDER_CHOICE_CORRECTION'
+        EXPORTING
+          iv_category = zif_ca_ttemplate_data=>cs_transport_order-category
+        IMPORTING
+          ev_order    = mv_transport_order
+        EXCEPTIONS
+          OTHERS      = 3.
+
+    ENDIF.
 
   ENDMETHOD.
 

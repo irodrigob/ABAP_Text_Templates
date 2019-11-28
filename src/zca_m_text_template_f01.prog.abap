@@ -67,8 +67,9 @@ FORM save_template.
       mo_controller->save( ).
 
       MESSAGE s002.
-    CATCH zcx_ca_text_template.
-      MESSAGE w003.
+
+    CATCH zcx_ca_text_template INTO DATA(lo_excep).
+      MESSAGE lo_excep->get_text(  ) TYPE 'W'.
   ENDTRY.
 ENDFORM.
 FORM copy_template.

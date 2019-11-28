@@ -45,6 +45,8 @@ MODULE user_command_9000 INPUT.
 
         WHEN zif_ca_ttemplate_data=>cs_edit_program-buttons_code-template_copy.
           PERFORM copy_template.
+        WHEN zif_ca_ttemplate_data=>cs_edit_program-buttons_code-template_transport.
+
       ENDCASE.
     CATCH zcx_ca_text_template INTO DATA(lo_excep_user_command).
 

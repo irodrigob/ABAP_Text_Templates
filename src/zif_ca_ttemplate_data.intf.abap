@@ -29,7 +29,7 @@ INTERFACE zif_ca_ttemplate_data
                  template_transport TYPE string VALUE 'TTRANSP',
                  template_save      TYPE string VALUE 'TSAVE',
                  template_close     TYPE string VALUE 'TCLOSE',
-                 template_copy     TYPE string VALUE 'TCOPY',
+                 template_copy      TYPE string VALUE 'TCOPY',
                END OF buttons_code,
                BEGIN OF popup_answer,
                  yes    TYPE c LENGTH 1 VALUE '1',
@@ -43,5 +43,17 @@ INTERFACE zif_ca_ttemplate_data
                  encoding TYPE string VALUE 'utf-8',
                END OF btf_editor,
              END OF cs_edit_program.
-
+  CONSTANTS: BEGIN OF cs_transport_order,
+               workbench         TYPE e070-trfunction VALUE 'S',
+               status_modifiable TYPE trstatus VALUE 'D',
+               pgmid             TYPE e071k-pgmid VALUE 'R3TR',
+               object            TYPE e071k-object VALUE 'TABU',
+               tabname           TYPE e071k-objname VALUE 'ZCA_T_TEXT_TEMPL',
+               category          TYPE e070-korrdev VALUE 'SYST',
+               BEGIN OF order_objfunc,
+                 normal    TYPE objfunc VALUE space,
+                 delete    TYPE objfunc VALUE 'D',
+                 key_value TYPE objfunc VALUE 'K',
+               END OF order_objfunc,
+             END OF cs_transport_order.
 ENDINTERFACE.
