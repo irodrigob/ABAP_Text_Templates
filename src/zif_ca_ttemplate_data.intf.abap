@@ -2,6 +2,8 @@ INTERFACE zif_ca_ttemplate_data
   PUBLIC .
   TYPES: tv_edit TYPE c LENGTH 1.
   TYPES: tt_r_langu TYPE RANGE OF sylangu.
+  TYPES: tt_r_appl TYPE RANGE OF zca_t_text_templ-appl.
+  TYPES: tt_r_template TYPE RANGE OF zca_t_text_templ-name.
 
   CONSTANTS: BEGIN OF cs_section,
                subject TYPE zca_e_ttempl_section VALUE 'S',

@@ -22,7 +22,28 @@ CLASS zcl_ca_text_template DEFINITION
     TYPES: tt_key_fields TYPE STANDARD TABLE OF ts_key_fields WITH EMPTY KEY.
     TYPES: ts_text_template_db TYPE zca_t_text_templ.
     TYPES: tt_text_template_db TYPE STANDARD TABLE OF ts_text_template_db WITH EMPTY KEY.
+    TYPES: BEGIN OF ts_appl,
+             appl TYPE zca_t_text_templ-appl,
+           END OF ts_appl.
+    TYPES: tt_appl TYPE STANDARD TABLE OF ts_appl WITH EMPTY KEY.
 
+    TYPES: BEGIN OF ts_template,
+             appl TYPE zca_t_text_templ-appl,
+             name TYPE zca_t_text_templ-name,
+           END OF ts_template.
+    TYPES: tt_template TYPE STANDARD TABLE OF ts_template WITH EMPTY KEY.
+
+    "! <p class="shorttext synchronized" lang="en">Get unique appl in the database</p>
+    "! Get the unique appl, useful for the search help
+    "! @parameter rv_appl | <p class="shorttext synchronized" lang="en"></p>
+    METHODS get_appl
+      RETURNING VALUE(rt_appl) TYPE tt_appl.
+    "! <p class="shorttext synchronized" lang="en">Get unique appl and template in the database</p>
+    "! Get the unique appl and template, useful for the search help
+    "! @parameter rv_appl | <p class="shorttext synchronized" lang="en"></p>
+    METHODS get_template
+      IMPORTING iv_appl            TYPE zca_e_ttempl_appl OPTIONAL
+      RETURNING VALUE(rt_template) TYPE tt_template.
     "! <p class="shorttext synchronized" lang="en">Check if template exist</p>
     "!
     "! @parameter iv_appl | <p class="shorttext synchronized" lang="en"></p>
@@ -152,7 +173,7 @@ ENDCLASS.
 
 
 
-CLASS zcl_ca_text_template IMPLEMENTATION.
+CLASS ZCL_CA_TEXT_TEMPLATE IMPLEMENTATION.
 
 
   METHOD check_transport_order.
@@ -323,6 +344,30 @@ CLASS zcl_ca_text_template IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD get_appl.
+    CLEAR: rt_appl.
+
+    SELECT DISTINCT appl INTO TABLE rt_appl
+           FROM zca_t_text_templ.
+
+  ENDMETHOD.
+
+
+  METHOD get_template.
+
+    CLEAR: rt_template.
+
+    IF iv_appl IS NOT INITIAL.
+      DATA(lt_r_appl) = VALUE zif_ca_ttemplate_data=>tt_r_template( ( sign = 'I' option = 'EQ' low = iv_appl ) ).
+    ENDIF.
+
+    SELECT DISTINCT appl name INTO TABLE rt_template
+             FROM zca_t_text_templ
+             WHERE appl IN lt_r_appl.
+
+  ENDMETHOD.
+
+
   METHOD read.
 
     CLEAR et_data.
@@ -373,9 +418,6 @@ CLASS zcl_ca_text_template IMPLEMENTATION.
 
     ENDIF.
   ENDMETHOD.
-
-
-
 
 
   METHOD transport_template.

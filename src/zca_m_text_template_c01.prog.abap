@@ -40,6 +40,14 @@ CLASS lcl_contr DEFINITION.
     METHODS check_mail_changed
       RETURNING
         VALUE(rv_changed) TYPE sap_bool.
+    METHODS f4_appl
+      RETURNING VALUE(rv_appl) TYPE zca_t_text_templ-appl.
+    METHODS f4_template
+      IMPORTING
+        iv_appl     TYPE zca_t_text_templ-appl OPTIONAL
+      EXPORTING
+        rv_appl     TYPE zca_t_text_templ-appl
+        rv_template TYPE zca_t_text_templ-name.
 
   PROTECTED SECTION.
     " Tabla interna que contiene todos las secciones en todos los idiomas de la plantilla
@@ -445,6 +453,19 @@ CLASS lcl_contr IMPLEMENTATION.
           OTHERS      = 3.
 
     ENDIF.
+
+  ENDMETHOD.
+
+  METHOD f4_appl.
+    " Se obtiene los posibles valores de la aplicación
+    data(lt_appl) = mo_model->get_appl(  ).
+
+  ENDMETHOD.
+
+  METHOD f4_template.
+
+  " Se obtiene los posibles valores de la aplicación
+    data(lt_template) = mo_model->get_template( mv_appl ).
 
   ENDMETHOD.
 
