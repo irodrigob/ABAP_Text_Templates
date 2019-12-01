@@ -80,6 +80,15 @@ public section.
       attr3 type scx_attrname value '',
       attr4 type scx_attrname value '',
     end of ACTION_CANCELED .
+  constants:
+    begin of NO_VALUES_TO_TRANSPORT,
+      msgid type symsgid value 'ZCA_TEXT_TEMPLATES',
+      msgno type symsgno value '015',
+      attr1 type scx_attrname value '',
+      attr2 type scx_attrname value '',
+      attr3 type scx_attrname value '',
+      attr4 type scx_attrname value '',
+    end of NO_VALUES_TO_TRANSPORT .
   data MV_MSG1 type STRING .
   data MV_MSG2 type STRING .
   data MV_MSG3 type STRING .

@@ -137,3 +137,16 @@ FORM copy_template.
 
 
 ENDFORM.
+FORM delete_template.
+
+  TRY.
+      mo_controller->delete( ).
+
+      MESSAGE s001.
+
+    CATCH zcx_ca_text_template INTO DATA(lo_excep).
+      MESSAGE lo_excep->get_text(  ) TYPE 'W'.
+  ENDTRY.
+
+
+ENDFORM.

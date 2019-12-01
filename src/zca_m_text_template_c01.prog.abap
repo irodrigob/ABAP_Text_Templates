@@ -26,7 +26,8 @@ CLASS lcl_contr DEFINITION.
       IMPORTING
                 !iv_langu TYPE sylangu OPTIONAL
       RAISING   zcx_ca_text_template.
-    METHODS delete.
+    METHODS delete
+      RAISING zcx_ca_text_template.
     METHODS copy
       IMPORTING
                 iv_appl_from     TYPE zca_t_text_templ-appl
@@ -363,10 +364,19 @@ CLASS lcl_contr IMPLEMENTATION.
 
 
   METHOD delete.
+
+    " Se selección la orden de transporte
+    select_check_transport_order(  ).
+
     mo_model->delete(
       EXPORTING
         iv_appl  = mv_appl
-        iv_name  = mv_template ).
+        iv_name  = mv_template
+        iv_save_transp_order = abap_true
+     CHANGING cv_order = mv_transport_order ).
+
+    " Se cierra el template
+    mo_controller->close_template(  ).
 
   ENDMETHOD.
 

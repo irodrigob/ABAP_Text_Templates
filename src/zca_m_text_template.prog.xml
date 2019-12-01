@@ -510,6 +510,7 @@
        <GROUP2>EDI</GROUP2>
        <GROUP4>MAI</GROUP4>
        <FORMAT>STRG</FORMAT>
+       <UP_LOWER>X</UP_LOWER>
        <INPUT_FLD>X</INPUT_FLD>
        <OUTPUT_FLD>X</OUTPUT_FLD>
       </RPY_DYFATC>

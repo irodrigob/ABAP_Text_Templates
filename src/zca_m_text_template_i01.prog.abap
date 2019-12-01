@@ -28,7 +28,6 @@ MODULE user_command_9000 INPUT.
           mo_controller->close_template(  ).
         WHEN zif_ca_ttemplate_data=>cs_edit_program-buttons_code-template_save.
           PERFORM save_template.
-
         WHEN zif_ca_ttemplate_data=>cs_edit_program-buttons_code-template_display.
           mv_edit_mode = zif_ca_ttemplate_data=>cs_edit_program-edit_mode-display.
           PERFORM read_template.
@@ -36,13 +35,7 @@ MODULE user_command_9000 INPUT.
           mv_edit_mode = zif_ca_ttemplate_data=>cs_edit_program-edit_mode-edit.
           PERFORM read_template.
         WHEN zif_ca_ttemplate_data=>cs_edit_program-buttons_code-template_delete.
-          mo_controller->delete(  ). " Se borra
-          " No hay control porque es simple un delete y no fallará.  Si falla es porque
-          " se ha borrado previamente
-          MESSAGE s001.
-          " Se cierra el template
-          mo_controller->close_template(  ).
-
+          PERFORM delete_template.
         WHEN zif_ca_ttemplate_data=>cs_edit_program-buttons_code-template_copy.
           PERFORM copy_template.
         WHEN zif_ca_ttemplate_data=>cs_edit_program-buttons_code-template_transport.
