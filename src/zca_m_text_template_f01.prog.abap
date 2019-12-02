@@ -62,16 +62,6 @@ FORM read_template .
 
 ENDFORM.
 
-FORM save_template.
-  TRY.
-      mo_controller->save( ).
-
-      MESSAGE s002.
-
-    CATCH zcx_ca_text_template INTO DATA(lo_excep).
-      MESSAGE lo_excep->get_text(  ) TYPE 'W'.
-  ENDTRY.
-ENDFORM.
 FORM copy_template.
   DATA lt_fields TYPE STANDARD TABLE OF sval.
   DATA lv_code TYPE c.
@@ -134,19 +124,6 @@ FORM copy_template.
         MESSAGE s000 WITH lo_excep->get_text(  ).
     ENDTRY.
   ENDIF.
-
-
-ENDFORM.
-FORM delete_template.
-
-  TRY.
-      mo_controller->delete( ).
-
-      MESSAGE s001.
-
-    CATCH zcx_ca_text_template INTO DATA(lo_excep).
-      MESSAGE lo_excep->get_text(  ) TYPE 'W'.
-  ENDTRY.
 
 
 ENDFORM.

@@ -27,18 +27,33 @@ MODULE user_command_9000 INPUT.
         WHEN zif_ca_ttemplate_data=>cs_edit_program-buttons_code-template_close.
           mo_controller->close_template(  ).
         WHEN zif_ca_ttemplate_data=>cs_edit_program-buttons_code-template_save.
-          PERFORM save_template.
+
+          mo_controller->save( ).
+          MESSAGE s002. " Mensaje que ha ido bien si no hay excepción
+
         WHEN zif_ca_ttemplate_data=>cs_edit_program-buttons_code-template_display.
+
           mv_edit_mode = zif_ca_ttemplate_data=>cs_edit_program-edit_mode-display.
           PERFORM read_template.
+
         WHEN zif_ca_ttemplate_data=>cs_edit_program-buttons_code-template_edit.
+
           mv_edit_mode = zif_ca_ttemplate_data=>cs_edit_program-edit_mode-edit.
           PERFORM read_template.
+
         WHEN zif_ca_ttemplate_data=>cs_edit_program-buttons_code-template_delete.
-          PERFORM delete_template.
+
+          mo_controller->delete( ).
+          MESSAGE s001. " Mensaje que ha ido bien si no hay excepción
+
         WHEN zif_ca_ttemplate_data=>cs_edit_program-buttons_code-template_copy.
+
           PERFORM copy_template.
+
         WHEN zif_ca_ttemplate_data=>cs_edit_program-buttons_code-template_transport.
+
+          mo_controller->transport( ).
+          MESSAGE s016. " Mensaje que ha ido bien si no hay excepción
 
       ENDCASE.
     CATCH zcx_ca_text_template INTO DATA(lo_excep_user_command).
@@ -109,4 +124,32 @@ MODULE change_laguage INPUT.
 
   ENDIF.
 
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  F4_APPL  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE f4_appl INPUT.
+  mo_controller->f4_appl( EXPORTING iv_dynpro = sy-dynnr
+                                    iv_program = sy-repid ).
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  F4_TEMPLATE  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE f4_template INPUT.
+  mo_controller->f4_template( EXPORTING iv_dynpro = sy-dynnr
+                                      iv_program = sy-repid ).
+
+
+  " Si se ha seleccionado aplicacion y template se simula que se pulsa enter(no hay manera
+  " de hacerlo de otra forma) para que la plantilla se vea en modo edición
+  IF mv_appl IS NOT INITIAL AND mv_template IS NOT INITIAL.
+
+    PERFORM change_template.
+    SET SCREEN 9000. LEAVE SCREEN.
+
+  ENDIF.
 ENDMODULE.

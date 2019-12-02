@@ -104,6 +104,12 @@
      <MSGNR>015</MSGNR>
      <TEXT>There are no values to transport</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZCA_TEXT_TEMPLATES</ARBGB>
+     <MSGNR>016</MSGNR>
+     <TEXT>Template added in the order</TEXT>
+    </T100>
    </T100>
   </asx:values>
  </asx:abap>

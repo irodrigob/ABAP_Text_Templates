@@ -26,6 +26,10 @@ CLASS lcl_contr DEFINITION.
       IMPORTING
                 !iv_langu TYPE sylangu OPTIONAL
       RAISING   zcx_ca_text_template.
+    METHODS transport
+      IMPORTING
+                !iv_langu TYPE sylangu OPTIONAL
+      RAISING   zcx_ca_text_template.
     METHODS delete
       RAISING zcx_ca_text_template.
     METHODS copy
@@ -41,13 +45,14 @@ CLASS lcl_contr DEFINITION.
       RETURNING
         VALUE(rv_changed) TYPE sap_bool.
     METHODS f4_appl
-      RETURNING VALUE(rv_appl) TYPE zca_t_text_templ-appl.
+      IMPORTING
+        iv_program TYPE syrepid
+        iv_dynpro  TYPE sydynnr.
     METHODS f4_template
       IMPORTING
-        iv_appl     TYPE zca_t_text_templ-appl OPTIONAL
-      EXPORTING
-        rv_appl     TYPE zca_t_text_templ-appl
-        rv_template TYPE zca_t_text_templ-name.
+        iv_appl    TYPE zca_t_text_templ-appl OPTIONAL
+        iv_program TYPE syrepid
+        iv_dynpro  TYPE sydynnr.
 
   PROTECTED SECTION.
     " Tabla interna que contiene todos las secciones en todos los idiomas de la plantilla
@@ -457,15 +462,91 @@ CLASS lcl_contr IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD f4_appl.
+    DATA lt_return TYPE STANDARD TABLE OF ddshretval.
+
     " Se obtiene los posibles valores de la aplicación
-    data(lt_appl) = mo_model->get_appl(  ).
+    DATA(lt_appl) = mo_model->get_appl(  ).
+
+    CALL FUNCTION 'F4IF_INT_TABLE_VALUE_REQUEST'
+      EXPORTING
+        retfield    = 'APPL'
+        dynpprog    = iv_program
+        dynpnr      = iv_dynpro
+        dynprofield = 'MV_APPL'
+        value_org   = 'S'
+      TABLES
+        value_tab   = lt_appl
+        return_tab  = lt_return[].
+
+    READ TABLE lt_return ASSIGNING FIELD-SYMBOL(<ls_return>) INDEX 1.
+    IF sy-subrc = 0.
+      READ TABLE lt_appl ASSIGNING FIELD-SYMBOL(<ls_appl>) INDEX <ls_return>-recordpos.
+      IF sy-subrc = 0.
+        mv_appl = <ls_appl>-appl.
+      ENDIF.
+    ENDIF.
 
   ENDMETHOD.
 
   METHOD f4_template.
+    DATA lt_return TYPE STANDARD TABLE OF ddshretval.
+    DATA lt_dynpfields TYPE STANDARD TABLE OF dynpread.
 
-  " Se obtiene los posibles valores de la aplicación
-    data(lt_template) = mo_model->get_template( mv_appl ).
+    " Se obtiene los posibles valores de la aplicación
+    DATA(lt_template) = mo_model->get_template( mv_appl ).
+
+    CALL FUNCTION 'F4IF_INT_TABLE_VALUE_REQUEST'
+      EXPORTING
+        retfield    = 'NAME'
+        dynpprog    = iv_program
+        dynpnr      = iv_dynpro
+        dynprofield = 'MV_NAME'
+        value_org   = 'S'
+      TABLES
+        value_tab   = lt_template
+        return_tab  = lt_return[].
+
+    READ TABLE lt_return ASSIGNING FIELD-SYMBOL(<ls_return>) INDEX 1.
+    IF sy-subrc = 0.
+      READ TABLE lt_template ASSIGNING FIELD-SYMBOL(<ls_template>) INDEX <ls_return>-recordpos.
+      IF sy-subrc = 0.
+        mv_appl = <ls_template>-appl.
+        mv_template = <ls_template>-name.
+
+        " Como la funcion del F4 solo actualiza el template tengo que actualizar en la dynpro el campo de aplicación manualmente
+        INSERT VALUE #( fieldname = 'MV_APPL' fieldvalue = mv_appl fieldinp = abap_true ) INTO TABLE lt_dynpfields.
+
+        CALL FUNCTION 'DYNP_VALUES_UPDATE'
+          EXPORTING
+            dyname     = iv_program
+            dynumb     = iv_dynpro
+          TABLES
+            dynpfields = lt_dynpfields.
+
+      ENDIF.
+    ENDIF.
+
+  ENDMETHOD.
+
+  METHOD transport.
+    CALL METHOD cl_gui_cfw=>flush
+      EXCEPTIONS
+        cntl_system_error = 1
+        cntl_error        = 2
+        OTHERS            = 3.
+
+    " Primero es mover las variables del programa a sus respectiva sección
+    transf_var_mail_2_sections( iv_langu ).
+
+    " Se selección la orden de transporte
+    select_check_transport_order(  ).
+
+    mo_model->transport_template(
+  EXPORTING
+    iv_appl              = mv_appl
+    iv_name              = mv_template
+    it_data              = mt_sections_data
+ CHANGING cv_order = mv_transport_order ).
 
   ENDMETHOD.
 
