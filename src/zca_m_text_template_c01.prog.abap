@@ -55,6 +55,12 @@ CLASS lcl_contr DEFINITION.
         iv_dynpro  TYPE sydynnr.
 
   PROTECTED SECTION.
+
+      TYPES: BEGIN OF ts_f4_template,
+             name TYPE c LENGTH 100,
+           END OF ts_f4_template.
+    TYPES tt_f4_template TYPE STANDARD TABLE OF ts_f4_template WITH EMPTY KEY.
+
     " Tabla interna que contiene todos las secciones en todos los idiomas de la plantilla
     DATA mt_sections_data TYPE zcl_ca_text_template=>tt_section_content.
 
@@ -489,41 +495,54 @@ CLASS lcl_contr IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD f4_template.
+
+
     DATA lt_return TYPE STANDARD TABLE OF ddshretval.
     DATA lt_dynpfields TYPE STANDARD TABLE OF dynpread.
+    DATA lt_f4 TYPE tt_f4_template.
+    DATA lt_field_tab TYPE TABLE OF dfies.
 
     " Se obtiene los posibles valores de la aplicación
     DATA(lt_template) = mo_model->get_template( mv_appl ).
 
+    " Debido a que la función estándar solo devuelve el valor del campo que se le pasa, hay que concatenar
+    " la appl y template. El motivo es que puede ser que una plantilla tengo el mismo nombre en dos aplicacion y no encontraría bien
+    " el resultado.
+    LOOP AT lt_template ASSIGNING FIELD-SYMBOL(<wa>).
+      INSERT VALUE #( name = |{ <wa>-appl } - { <wa>-name }| ) INTO TABLE lt_f4.
+    ENDLOOP.
+
+    INSERT VALUE #( fieldname = 'NAME' reptext = TEXT-c01 outputlen = 100 intlen = 100 inttype = 'C' )  INTO TABLE lt_field_tab.
+
     CALL FUNCTION 'F4IF_INT_TABLE_VALUE_REQUEST'
       EXPORTING
-        retfield    = 'NAME'
-        dynpprog    = iv_program
-        dynpnr      = iv_dynpro
-        dynprofield = 'MV_NAME'
-        value_org   = 'S'
+        retfield   = 'NAME'
+        dynpprog   = iv_program
+        dynpnr     = iv_dynpro
+        value_org  = 'S'
       TABLES
-        value_tab   = lt_template
-        return_tab  = lt_return[].
+        value_tab  = lt_f4[]
+        return_tab = lt_return[]
+        field_tab  = lt_field_tab[].
+
 
     READ TABLE lt_return ASSIGNING FIELD-SYMBOL(<ls_return>) INDEX 1.
     IF sy-subrc = 0.
-      READ TABLE lt_template ASSIGNING FIELD-SYMBOL(<ls_template>) INDEX <ls_return>-recordpos.
-      IF sy-subrc = 0.
-        mv_appl = <ls_template>-appl.
-        mv_template = <ls_template>-name.
 
-        " Como la funcion del F4 solo actualiza el template tengo que actualizar en la dynpro el campo de aplicación manualmente
-        INSERT VALUE #( fieldname = 'MV_APPL' fieldvalue = mv_appl fieldinp = abap_true ) INTO TABLE lt_dynpfields.
+      " Del campo se hace el split para saber el valor escogido
+      SPLIT <ls_return>-fieldval AT ' - ' INTO: mv_appl mv_template.
 
-        CALL FUNCTION 'DYNP_VALUES_UPDATE'
-          EXPORTING
-            dyname     = iv_program
-            dynumb     = iv_dynpro
-          TABLES
-            dynpfields = lt_dynpfields.
+      " Se actualiza los valores de la dynpro con los nuevos valores.
+      INSERT VALUE #( fieldname = 'MV_APPL' fieldvalue = mv_appl fieldinp = abap_true ) INTO TABLE lt_dynpfields.
+      INSERT VALUE #( fieldname = 'MV_TEMPLATE' fieldvalue = mv_template fieldinp = abap_true ) INTO TABLE lt_dynpfields.
 
-      ENDIF.
+      CALL FUNCTION 'DYNP_VALUES_UPDATE'
+        EXPORTING
+          dyname     = iv_program
+          dynumb     = iv_dynpro
+        TABLES
+          dynpfields = lt_dynpfields.
+
     ENDIF.
 
   ENDMETHOD.

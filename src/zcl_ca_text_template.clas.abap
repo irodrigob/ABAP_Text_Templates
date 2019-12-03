@@ -173,7 +173,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_CA_TEXT_TEMPLATE IMPLEMENTATION.
+CLASS zcl_ca_text_template IMPLEMENTATION.
 
 
   METHOD check_transport_order.
@@ -198,10 +198,19 @@ CLASS ZCL_CA_TEXT_TEMPLATE IMPLEMENTATION.
 
     IF sy-subrc NE 0. " Si no existe se lanza excepción
       RAISE EXCEPTION TYPE zcx_ca_text_template
-        MESSAGE ID sy-msgid
-        TYPE sy-msgty
-        NUMBER sy-msgno
-        WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+        EXPORTING
+          textid = VALUE #( msgid = sy-msgid
+                            msgno = sy-msgno
+                            attr1 = sy-msgv1
+                            attr2 = sy-msgv2
+                            attr3 = sy-msgv3
+                            attr4 = sy-msgv4  ).
+      " Código versiones 7.5x
+*      RAISE EXCEPTION TYPE zcx_ca_text_template
+*        MESSAGE ID sy-msgid
+*        TYPE sy-msgty
+*        NUMBER sy-msgno
+*        WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
     ENDIF.
 
     " Se busca una tarea valida en la orden
@@ -239,15 +248,23 @@ CLASS ZCL_CA_TEXT_TEMPLATE IMPLEMENTATION.
 
         IF sy-subrc NE 0.
           RAISE EXCEPTION TYPE zcx_ca_text_template
-            MESSAGE ID sy-msgid
-            TYPE sy-msgty
-            NUMBER sy-msgno
-            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+            EXPORTING
+              textid = VALUE #( msgid = sy-msgid
+                                msgno = sy-msgno
+                                attr1 = sy-msgv1
+                                attr2 = sy-msgv2
+                                attr3 = sy-msgv3
+                                attr4 = sy-msgv4  ).
+          " Código versiones 7.5x
+*      RAISE EXCEPTION TYPE zcx_ca_text_template
+*        MESSAGE ID sy-msgid
+*        TYPE sy-msgty
+*        NUMBER sy-msgno
+*        WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
         ENDIF.
-
       ENDIF.
-    ENDIF.
 
+    ENDIF.
 
   ENDMETHOD.
 
@@ -467,11 +484,21 @@ CLASS ZCL_CA_TEXT_TEMPLATE IMPLEMENTATION.
         OTHERS                = 68.
     IF sy-subrc NE 0.
       RAISE EXCEPTION TYPE zcx_ca_text_template
-        MESSAGE ID sy-msgid
-        TYPE sy-msgty
-        NUMBER sy-msgno
-        WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+        EXPORTING
+          textid = VALUE #( msgid = sy-msgid
+                            msgno = sy-msgno
+                            attr1 = sy-msgv1
+                            attr2 = sy-msgv2
+                            attr3 = sy-msgv3
+                            attr4 = sy-msgv4  ).
+      " Código versiones 7.5x
+*      RAISE EXCEPTION TYPE zcx_ca_text_template
+*        MESSAGE ID sy-msgid
+*        TYPE sy-msgty
+*        NUMBER sy-msgno
+*        WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
     ENDIF.
+
 
   ENDMETHOD.
 ENDCLASS.

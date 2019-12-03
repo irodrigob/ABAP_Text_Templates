@@ -9,6 +9,7 @@ INTERFACE zif_ca_ttemplate_data
                subject TYPE zca_e_ttempl_section VALUE 'S',
                body    TYPE zca_e_ttempl_section VALUE 'B',
              END OF cs_section.
+  CONSTANTS: cv_main_tabname TYPE tabname VALUE 'ZCA_T_TEXT_TEMPL'.
 
   CONSTANTS: BEGIN OF cs_edit_program,
                BEGIN OF edit_mode,

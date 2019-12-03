@@ -767,6 +767,17 @@
    </CUA>
    <TPOOL>
     <item>
+     <ID>R</ID>
+     <ENTRY>Program ZCA_R_TEXT_TEMPLATE</ENTRY>
+     <LENGTH>27</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>C01</KEY>
+     <ENTRY>Template name</ENTRY>
+     <LENGTH>23</LENGTH>
+    </item>
+    <item>
      <ID>I</ID>
      <KEY>NOP</KEY>
      <ENTRY>No</ENTRY>
@@ -807,11 +818,6 @@
      <KEY>YES</KEY>
      <ENTRY>Yes</ENTRY>
      <LENGTH>13</LENGTH>
-    </item>
-    <item>
-     <ID>R</ID>
-     <ENTRY>Program ZCA_R_TEXT_TEMPLATE</ENTRY>
-     <LENGTH>27</LENGTH>
     </item>
    </TPOOL>
   </asx:values>
