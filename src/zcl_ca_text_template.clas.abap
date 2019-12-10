@@ -28,8 +28,9 @@ CLASS zcl_ca_text_template DEFINITION
     TYPES: tt_appl TYPE STANDARD TABLE OF ts_appl WITH EMPTY KEY.
 
     TYPES: BEGIN OF ts_template,
-             appl TYPE zca_t_text_templ-appl,
-             name TYPE zca_t_text_templ-name,
+             appl  TYPE zca_t_text_templ-appl,
+             name  TYPE zca_t_text_templ-name,
+             langu TYPE sylangu,
            END OF ts_template.
     TYPES: tt_template TYPE STANDARD TABLE OF ts_template WITH EMPTY KEY.
 
@@ -378,7 +379,7 @@ CLASS zcl_ca_text_template IMPLEMENTATION.
       DATA(lt_r_appl) = VALUE zif_ca_ttemplate_data=>tt_r_template( ( sign = 'I' option = 'EQ' low = iv_appl ) ).
     ENDIF.
 
-    SELECT DISTINCT appl name INTO TABLE rt_template
+    SELECT DISTINCT appl name langu INTO TABLE rt_template
              FROM zca_t_text_templ
              WHERE appl IN lt_r_appl.
 

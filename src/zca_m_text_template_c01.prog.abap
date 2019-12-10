@@ -56,7 +56,7 @@ CLASS lcl_contr DEFINITION.
 
   PROTECTED SECTION.
 
-      TYPES: BEGIN OF ts_f4_template,
+    TYPES: BEGIN OF ts_f4_template,
              name TYPE c LENGTH 100,
            END OF ts_f4_template.
     TYPES tt_f4_template TYPE STANDARD TABLE OF ts_f4_template WITH EMPTY KEY.
@@ -73,6 +73,7 @@ CLASS lcl_contr DEFINITION.
     DATA mo_mail_body_doc TYPE REF TO if_btf_document.
     DATA mv_transf_mail_body_editor TYPE sap_bool.
     DATA mv_transport_order TYPE e070-trkorr.
+    DATA mv_allowed_transport TYPE sap_bool.
 
     METHODS destroy_mail_body_object.
     METHODS create_editor_mail_objects
@@ -86,7 +87,12 @@ CLASS lcl_contr DEFINITION.
         VALUE(rv_body) TYPE bsstring.
     METHODS select_check_transport_order
       RAISING zcx_ca_text_template.
-
+    METHODS allowed_transport
+      RETURNING
+        VALUE(rv_allowed) TYPE sap_bool .
+    METHODS allowed_modify_data
+      RETURNING
+        VALUE(rv_allowed) TYPE sap_bool .
 
 
 
@@ -96,6 +102,10 @@ CLASS lcl_contr IMPLEMENTATION.
 
   METHOD constructor.
     mo_model = NEW zcl_ca_text_template(  ).
+
+    " Se determina si se podra transportar segun la configuración del sistema
+    mv_allowed_transport = allowed_transport(  ).
+
   ENDMETHOD.
 
   METHOD exist.
@@ -279,8 +289,10 @@ CLASS lcl_contr IMPLEMENTATION.
     " Primero es mover las variables del programa a sus respectiva sección
     transf_var_mail_2_sections( iv_langu ).
 
-    " Se selección la orden de transporte
-    select_check_transport_order(  ).
+    " Se selección la orden de transporte, si se puede transportar
+    IF mv_allowed_transport = abap_true.
+      select_check_transport_order(  ).
+    ENDIF.
 
 
     mo_model->save(
@@ -288,7 +300,7 @@ CLASS lcl_contr IMPLEMENTATION.
         iv_appl              = mv_appl
         iv_name              = mv_template
         it_data              = mt_sections_data
-        iv_save_transp_order = abap_true
+        iv_save_transp_order = mv_allowed_transport
      CHANGING cv_order = mv_transport_order ).
 
     " Se resetea que el cuerpo del mail ha sido modificado
@@ -384,14 +396,17 @@ CLASS lcl_contr IMPLEMENTATION.
 
   METHOD delete.
 
-    " Se selección la orden de transporte
-    select_check_transport_order(  ).
+    " Se selección la orden de transporte, si se puede transportar
+    IF mv_allowed_transport = abap_true.
+      select_check_transport_order(  ).
+    ENDIF.
+
 
     mo_model->delete(
       EXPORTING
         iv_appl  = mv_appl
         iv_name  = mv_template
-        iv_save_transp_order = abap_true
+        iv_save_transp_order = mv_allowed_transport
      CHANGING cv_order = mv_transport_order ).
 
     " Se cierra el template
@@ -501,6 +516,7 @@ CLASS lcl_contr IMPLEMENTATION.
     DATA lt_dynpfields TYPE STANDARD TABLE OF dynpread.
     DATA lt_f4 TYPE tt_f4_template.
     DATA lt_field_tab TYPE TABLE OF dfies.
+    DATA lv_langu_iso TYPE laiso.
 
     " Se obtiene los posibles valores de la aplicación
     DATA(lt_template) = mo_model->get_template( mv_appl ).
@@ -509,7 +525,14 @@ CLASS lcl_contr IMPLEMENTATION.
     " la appl y template. El motivo es que puede ser que una plantilla tengo el mismo nombre en dos aplicacion y no encontraría bien
     " el resultado.
     LOOP AT lt_template ASSIGNING FIELD-SYMBOL(<wa>).
-      INSERT VALUE #( name = |{ <wa>-appl } - { <wa>-name }| ) INTO TABLE lt_f4.
+
+      CALL FUNCTION 'CONVERSION_EXIT_ISOLA_OUTPUT'
+        EXPORTING
+          input  = <wa>-langu
+        IMPORTING
+          output = lv_langu_iso.
+
+      INSERT VALUE #( name = |{ <wa>-appl } - { <wa>-name } - { lv_langu_iso }| ) INTO TABLE lt_f4.
     ENDLOOP.
 
     INSERT VALUE #( fieldname = 'NAME' reptext = TEXT-c01 outputlen = 100 intlen = 100 inttype = 'C' )  INTO TABLE lt_field_tab.
@@ -530,11 +553,12 @@ CLASS lcl_contr IMPLEMENTATION.
     IF sy-subrc = 0.
 
       " Del campo se hace el split para saber el valor escogido
-      SPLIT <ls_return>-fieldval AT ' - ' INTO: mv_appl mv_template.
+      SPLIT <ls_return>-fieldval AT ' - ' INTO: mv_appl mv_template mv_langu.
 
       " Se actualiza los valores de la dynpro con los nuevos valores.
       INSERT VALUE #( fieldname = 'MV_APPL' fieldvalue = mv_appl fieldinp = abap_true ) INTO TABLE lt_dynpfields.
       INSERT VALUE #( fieldname = 'MV_TEMPLATE' fieldvalue = mv_template fieldinp = abap_true ) INTO TABLE lt_dynpfields.
+      INSERT VALUE #( fieldname = 'MV_LANGU' fieldvalue = mv_langu fieldinp = abap_true ) INTO TABLE lt_dynpfields.
 
       CALL FUNCTION 'DYNP_VALUES_UPDATE'
         EXPORTING
@@ -567,6 +591,45 @@ CLASS lcl_contr IMPLEMENTATION.
     it_data              = mt_sections_data
  CHANGING cv_order = mv_transport_order ).
 
+  ENDMETHOD.
+
+  METHOD allowed_modify_data.
+    DATA ld_transp_state  TYPE t000-cccoractiv.
+    DATA ld_cliindep_state  TYPE t000-ccnocliind.
+    DATA ld_client_state  TYPE t000-cccategory.
+
+    CALL FUNCTION 'VIEW_GET_CLIENT_STATE'
+      IMPORTING
+        transp_state   = ld_transp_state
+        cliindep_state = ld_cliindep_state
+        client_state   = ld_client_state.
+
+    IF ld_cliindep_state = space.
+      rv_allowed = abap_true.
+    ELSE.
+      rv_allowed = abap_false.
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD allowed_transport.
+    DATA ld_transp_state  TYPE t000-cccoractiv.
+    DATA ld_cliindep_state  TYPE t000-ccnocliind.
+    DATA ld_client_state  TYPE t000-cccategory.
+
+    CALL FUNCTION 'VIEW_GET_CLIENT_STATE'
+      IMPORTING
+        transp_state   = ld_transp_state
+        cliindep_state = ld_cliindep_state
+        client_state   = ld_client_state.
+
+    IF ld_transp_state = '3' OR ld_transp_state = '2'.
+      rv_allowed = abap_false.
+* Si el sistema no se puede modificar, tampoco se podra transportar.
+    ELSEIF allowed_modify_data( ) = abap_false.
+      rv_allowed = abap_false.
+    ELSE.
+      rv_allowed = abap_true.
+    ENDIF.
   ENDMETHOD.
 
 ENDCLASS.
